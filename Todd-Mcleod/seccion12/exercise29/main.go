@@ -5,25 +5,18 @@ import (
 	"math/rand"
 )
 
-
 func main() {
-
 	for i := 0; i < 100; i++ {
 		fmt.Println(i)
 	}
 
-
-
 	for i := 0; i <= 100; i++ {
 		x := rand.Intn(11)
 		y := rand.Intn(11)
-	
+
 		fmt.Printf("El valor de X es %v \n", x)
 		fmt.Printf("El valor de Y es %v \n", y)
-	
-	
-	
-	
+
 		switch {
 		case (x < 4) && (y < 4):
 			fmt.Println("X e Y son menores que 4.")
@@ -41,5 +34,4 @@ func main() {
 			fmt.Println("Este for hizo 100 loops")
 		}
 	}
-	
 }
