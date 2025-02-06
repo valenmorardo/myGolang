@@ -15,4 +15,14 @@ func main() {
 	for _, value := range sliceHelados {
 		fmt.Println(value)
 	}
+
+
+	sliceNumero := []int{}
+
+	fmt.Println(sliceNumero)
+
+	sliceNumero = append(sliceNumero, 24, 12, )
+
+	fmt.Println(sliceNumero)
+
 }
