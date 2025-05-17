@@ -6,7 +6,6 @@ type Cliente struct {
 	Nombre string
 	Correo string
 	Telefono string
-
 }
 
 type Clientes []Cliente
