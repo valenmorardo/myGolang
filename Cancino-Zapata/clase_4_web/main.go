@@ -29,8 +29,8 @@ func main() {
 
 	mux.HandleFunc("/", routes.Home)
 	mux.HandleFunc("/about-us", routes.Aboutus)
-	mux.HandleFunc("/about-us", routes.Aboutus)
 	mux.HandleFunc("/params/{id:[0-9]+}/{slug:[a-zA-Z0-9-]+}", routes.Params)
+	mux.HandleFunc("/params-querystring", routes.ParamsQueryString)
 
 	envData := utils.GetEnvData()
 
