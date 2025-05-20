@@ -28,11 +28,12 @@ func main() {
 	mux := mux.NewRouter()
 
 	mux.HandleFunc("/", routes.Home)
+	mux.HandleFunc("/about-us", routes.Aboutus)
 
 	envData := utils.GetEnvData()
 
 	server := &http.Server{
-		Addr:         fmt.Sprintf("localhost:%v", envData.SERVER_PORT),
+		Addr:         fmt.Sprintf("%v:%v", envData.SERVER, envData.SERVER_PORT),
 		Handler:      mux,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,

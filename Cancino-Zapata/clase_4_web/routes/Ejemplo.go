@@ -5,8 +5,11 @@ import (
 	"net/http"
 )
 
-
-
 func Home(res http.ResponseWriter, req *http.Request) {
-	fmt.Fprintln(res, "Hola mundi")
+	fmt.Fprintln(res, "Hola mundoooooooo")
+}
+
+
+func Aboutus(res http.ResponseWriter, req *http.Request) {
+	fmt.Fprintln(res, "About Us")
 }
