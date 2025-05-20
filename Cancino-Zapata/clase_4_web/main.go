@@ -8,6 +8,8 @@ import (
 
 	"clase_4_web/routes"
 
+	"clase_4_web/utils"
+
 	"github.com/gorilla/mux"
 )
 
@@ -24,10 +26,13 @@ import (
 
 func main() {
 	mux := mux.NewRouter()
+
 	mux.HandleFunc("/", routes.Home)
 
+	envData := utils.GetEnvData()
+
 	server := &http.Server{
-		Addr:         "localhost:3001",
+		Addr:         fmt.Sprintf("localhost:%v", envData.SERVER_PORT),
 		Handler:      mux,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
