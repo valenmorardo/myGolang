@@ -1,13 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"time"
 
 	"clase_4_web/routes"
-
 	"clase_4_web/utils"
 
 	"github.com/gorilla/mux"
@@ -23,6 +25,7 @@ import (
 	fmt.Println("Server up --> localhost:3001")
 	log.Fatal(http.ListenAndServe("localhost:3001", nil))
 } */
+
 
 func main() {
 	mux := mux.NewRouter()
@@ -40,6 +43,30 @@ func main() {
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-	fmt.Println("Server up --> localhost:3001")
-	log.Fatal(server.ListenAndServe())
+
+	// Ejecutamos el servidor en una goroutine
+	go func() {
+		log.Printf("Server up --> http://%v:%v\n", envData.SERVER, envData.SERVER_PORT)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Error al iniciar el servidor: %v", err)
+		}
+	}()
+
+	// Esperamos Ctrl+C
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt)
+
+	<-stop // Queda "parado" acá hasta que presiones Ctrl+C
+
+	log.Println("Apagando el servidor...")
+
+	// Contexto con timeout para shutdown elegante
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Error al apagar el servidor: %v", err)
+	}
+
+	log.Println("Servidor apagado correctamente")
 }
