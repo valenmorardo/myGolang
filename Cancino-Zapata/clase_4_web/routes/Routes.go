@@ -1,16 +1,55 @@
 package routes
 
 import (
-	"fmt"
+	_ "fmt"
+	"html/template"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	_ "github.com/gorilla/mux"
 )
 
+
+
 func Home(res http.ResponseWriter, req *http.Request) {
-	fmt.Fprintln(res, "Hola mundoooooooo")
+	template, err := template.ParseFiles("templates/ejemplo/home.html")
+
+	if err != nil {
+		panic(err)
+	} else {
+		template.Execute(res, nil)
+	}
 }
 
+func Aboutus(res http.ResponseWriter, req *http.Request) {
+	template, err := template.ParseFiles("templates/ejemplo/aboutus.html")
+	if err != nil {
+		panic(err)
+	} else {
+		template.Execute(res, nil)
+	}
+}
+
+func Params(res http.ResponseWriter, req *http.Request) {
+	template, err := template.ParseFiles("templates/ejemplo/params.html")
+	if err != nil {
+		panic(err)
+	} else {
+		template.Execute(res, nil)
+	}
+}
+
+func ParamsQueryString(res http.ResponseWriter, req *http.Request) {
+	template, err := template.ParseFiles("templates/ejemplo/paramsquerystring.html") 
+	if err != nil {
+		panic(err)
+	} else {
+		template.Execute(res, nil)
+	}
+}
+
+/* func Home(res http.ResponseWriter, req *http.Request) {
+	fmt.Fprintln(res, "Hola mundoooooooo")
+}
 
 func Aboutus(res http.ResponseWriter, req *http.Request) {
 	fmt.Fprintln(res, "About Us")
@@ -33,3 +72,4 @@ func ParamsQueryString(res http.ResponseWriter, req *http.Request) {
 	slug := req.URL.Query().Get("slug")
 	fmt.Fprintf(res, "Slug: %v\n", slug)
 }
+ */
