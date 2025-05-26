@@ -5,10 +5,9 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	_ "github.com/gorilla/mux"
 )
-
-
 
 func Home(res http.ResponseWriter, req *http.Request) {
 	template, err := template.ParseFiles("templates/ejemplo/home.html")
@@ -33,18 +32,29 @@ func Params(res http.ResponseWriter, req *http.Request) {
 	template, err := template.ParseFiles("templates/ejemplo/params.html")
 	if err != nil {
 		panic(err)
-	} else {
-		template.Execute(res, nil)
 	}
+
+	params := mux.Vars(req)
+	dataParams := map[string]string{
+		"id":   params["id"],
+		"slug": params["slug"],
+	}
+
+	template.Execute(res, dataParams)
 }
 
 func ParamsQueryString(res http.ResponseWriter, req *http.Request) {
-	template, err := template.ParseFiles("templates/ejemplo/paramsquerystring.html") 
+	template, err := template.ParseFiles("templates/ejemplo/paramsquerystring.html")
 	if err != nil {
 		panic(err)
-	} else {
-		template.Execute(res, nil)
 	}
+
+	query := req.URL.Query()
+	dataParams := map[string]string{
+		"id":   query.Get("id"),
+		"slug": query.Get("slug"),
+	}
+	template.Execute(res, dataParams)
 }
 
 /* func Home(res http.ResponseWriter, req *http.Request) {
@@ -72,4 +82,4 @@ func ParamsQueryString(res http.ResponseWriter, req *http.Request) {
 	slug := req.URL.Query().Get("slug")
 	fmt.Fprintf(res, "Slug: %v\n", slug)
 }
- */
+*/
