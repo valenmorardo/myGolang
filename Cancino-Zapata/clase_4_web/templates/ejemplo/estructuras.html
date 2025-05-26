@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+        <h1>Estructuras</h1>
+        <h3>Definicion de variables</h3>
+        {{with $miVariable:="mi variable desde estructuras"}}
+        <p>{{$miVariable}}</p>
+        {{end}}
+        <hr />
+
+        <h3>Variables desde un type struct</h3>
+        <ul>
+            <li>
+                Nombre: {{.Nombre}}
+            </li>
+            <li>
+                Apellido: {{.Apellido}}
+            </li>
+            <li>
+                Edad: {{.Edad}}
+            </li>
+        </ul>
+        <hr />
+        <h3>Condicionales</h3>
+        {{
+        if ge .Edad 18
+        }}
+        <p>Sos mayor de edad</p>
+        {{else}}
+        <p>Sos menor de edad</p>
+        {{
+        end
+        }}
+        <hr />
+        <h3>Iteraciones</h3>
+        {{.Habilidades}}
+        <ul>
+            {{range .Habilidades}}
+                <li>
+                    {{.Nombre}}
+                </li>
+            {{end}}
+        </ul>
+    </body>
+</html>

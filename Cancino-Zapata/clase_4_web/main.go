@@ -26,7 +26,6 @@ import (
 	log.Fatal(http.ListenAndServe("localhost:3001", nil))
 } */
 
-
 func main() {
 	mux := mux.NewRouter()
 
@@ -35,6 +34,7 @@ func main() {
 	mux.HandleFunc("/params", routes.Params)
 	mux.HandleFunc("/params/{id:[0-9]+}/{slug:[a-zA-Z0-9-]+}", routes.Params)
 	mux.HandleFunc("/params-querystring", routes.ParamsQueryString)
+	mux.HandleFunc("/estructuras", routes.Estructuras)
 
 	envData := utils.GetEnvData()
 
@@ -48,7 +48,8 @@ func main() {
 	// Ejecutamos el servidor en una goroutine
 	go func() {
 		log.Printf("Server up --> http://%v:%v\n", envData.SERVER, envData.SERVER_PORT)
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		err := server.ListenAndServe()
+		if err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Error al iniciar el servidor: %v", err)
 		}
 	}()

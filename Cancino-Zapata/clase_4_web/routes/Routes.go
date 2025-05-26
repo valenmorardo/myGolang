@@ -1,12 +1,10 @@
 package routes
 
 import (
-	_ "fmt"
 	"html/template"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	_ "github.com/gorilla/mux"
 )
 
 func Home(res http.ResponseWriter, req *http.Request) {
@@ -55,6 +53,34 @@ func ParamsQueryString(res http.ResponseWriter, req *http.Request) {
 		"slug": query.Get("slug"),
 	}
 	template.Execute(res, dataParams)
+}
+
+type Datos struct {
+	Nombre      string
+	Apellido    string
+	Edad        int
+	Habilidades []Habilidad
+}
+type Habilidad struct {
+	Nombre string
+}
+
+func Estructuras(res http.ResponseWriter, req *http.Request) {
+	template, err := template.ParseFiles("templates/ejemplo/estructuras.html")
+	if err != nil {
+		panic(err)
+	}
+	Habilidad1 := Habilidad{"Videojuegos"}
+	Habilidad2 := Habilidad{"Programacion"}
+
+	valentin := Datos{
+		Nombre:      "Valentin",
+		Apellido:    "Morardo",
+		Edad:        2,
+		Habilidades: []Habilidad{Habilidad1, Habilidad2},
+	}
+
+	template.Execute(res, valentin)
 }
 
 /* func Home(res http.ResponseWriter, req *http.Request) {
