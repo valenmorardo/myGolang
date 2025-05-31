@@ -1,7 +1,10 @@
 package routes
 
 import (
+	"encoding/json"
+	"fmt"
 	"html/template"
+	"io"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -83,29 +86,52 @@ func Estructuras(res http.ResponseWriter, req *http.Request) {
 	template.Execute(res, valentin)
 }
 
-/* func Home(res http.ResponseWriter, req *http.Request) {
-	fmt.Fprintln(res, "Hola mundoooooooo")
-}
-
-func Aboutus(res http.ResponseWriter, req *http.Request) {
-	fmt.Fprintln(res, "About Us")
-}
-
-
-func Params(res http.ResponseWriter, req *http.Request) {
-	params := mux.Vars(req)
-
-	fmt.Fprintf(res, "ID: %v | SLUG: %v", params["id"], params["slug"])
-}
-
-func ParamsQueryString(res http.ResponseWriter, req *http.Request) {
-	fmt.Println(req.URL)
-	fmt.Println(req.URL.RawQuery)
-	fmt.Println(req.URL.Query())
-
-	id := req.URL.Query().Get("id")
-	fmt.Fprintf(res, "ID: %v\n", id)
-	slug := req.URL.Query().Get("slug")
-	fmt.Fprintf(res, "Slug: %v\n", slug)
+//////////////////////////////////////////////////////////////////////
+// ruta para req a otro endpoint
+// endpoint: www.api.tamila.cl/
+/*
+www.api.tamila.cl/api/login
+{
+"correo": "info@tamila.cl",
+"password": "p2gHNiENUw"
 }
 */
+// token de inicio de sesion. Reemplazarlo las veces que haga falta loggeando con los datos de arriba
+var Token string = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MzYsImlhdCI6MTc0ODY1NjgzNiwiZXhwIjoxNzUxMjQ4ODM2fQ.PUYUmxdB9VoAsF9GBmiRDqEiM3DgyGWIKw32_5Ezies"
+
+type Categoria struct {
+	Id int
+	Nombre string
+	Slug string
+	
+}
+type Categorias []Categoria
+
+func ClienteHttp_GetCategories(res http.ResponseWriter, req *http.Request) {
+	cliente := &http.Client{}
+	newReq, err := http.NewRequest("GET", "https://www.api.tamila.cl/api/categorias", nil)
+	if err != nil {
+		panic(err)
+	}
+
+	newReq.Header.Set("Authorization", Token)
+	response, err := cliente.Do(newReq)
+	if err != nil {
+		panic(err)
+	}
+	
+	defer response.Body.Close()
+	fmt.Println(response.Status)
+	responseBody, err := io.ReadAll(response.Body)
+	if err != nil {
+		panic(err)
+	}
+	datos := Categorias{}
+	errJson := json.Unmarshal(responseBody, &datos)
+	if errJson != nil {
+		panic(errJson)
+	}
+	for _, v := range datos {
+		fmt.Println(v)
+	}
+}

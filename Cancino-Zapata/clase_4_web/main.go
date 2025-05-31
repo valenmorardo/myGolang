@@ -36,6 +36,10 @@ func main() {
 	mux.HandleFunc("/params-querystring", routes.ParamsQueryString)
 	mux.HandleFunc("/estructuras", routes.Estructuras)
 
+
+	// ruta para hace request a otro endpoint
+	mux.HandleFunc("/cliente-http", routes.ClienteHttp_GetCategories)
+
 	envData := utils.GetEnvData()
 
 	server := &http.Server{
