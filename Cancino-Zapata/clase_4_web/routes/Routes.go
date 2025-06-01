@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -97,13 +98,12 @@ www.api.tamila.cl/api/login
 }
 */
 // token de inicio de sesion. Reemplazarlo las veces que haga falta loggeando con los datos de arriba
-var Token string = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MzYsImlhdCI6MTc0ODY1NjgzNiwiZXhwIjoxNzUxMjQ4ODM2fQ.PUYUmxdB9VoAsF9GBmiRDqEiM3DgyGWIKw32_5Ezies"
+var Token string = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MzYsImlhdCI6MTc0ODc0ODc2MiwiZXhwIjoxNzUxMzQwNzYyfQ.QSr4ZDpxSrD9AoaDEIuAAPaxy39T9VIi7oMfxHY4rgY"
 
 type Categoria struct {
-	Id int
-	Nombre string
-	Slug string
-	
+	Id     int    `json:"id"`
+	Nombre string `json:"nombre"`
+	Slug   string `json:"slug"`
 }
 type Categorias []Categoria
 
@@ -115,23 +115,91 @@ func ClienteHttp_GetCategories(res http.ResponseWriter, req *http.Request) {
 	}
 
 	newReq.Header.Set("Authorization", Token)
+
 	response, err := cliente.Do(newReq)
 	if err != nil {
 		panic(err)
 	}
-	
 	defer response.Body.Close()
-	fmt.Println(response.Status)
+
 	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
 		panic(err)
 	}
+
 	datos := Categorias{}
+
 	errJson := json.Unmarshal(responseBody, &datos)
 	if errJson != nil {
 		panic(errJson)
 	}
+
+	fmt.Fprintln(res, "LISTA DE CATEGORIAS:")
 	for _, v := range datos {
-		fmt.Println(v)
+		fmt.Fprintln(res, v)
 	}
+}
+
+func ClienteHttp_PostCategorie(res http.ResponseWriter, req *http.Request) {
+	// Creo mi categoria
+	miCategoria := Categoria{Nombre: "Voy a ser el mejor programador de Golang!"}
+
+	// a la categoria que esta en un tipo struct lo paso a json para usarlo como body para la req
+	jsonData, err := json.Marshal(miCategoria)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(bytes.NewBuffer(jsonData))
+	// Creo la request POST con el json creado antes y seteo los headers
+	reqPost, err := http.NewRequest("POST", "https://www.api.tamila.cl/api/categorias", bytes.NewBuffer(jsonData))
+	if err != nil {
+		panic(err)
+	}
+	reqPost.Header.Set("Authorization", Token)
+	// reqPost.Header.Set("Content-Type", "application/json")
+
+	// Creo el cliente para que haga la req
+	cliente := &http.Client{}
+	response, err := cliente.Do(reqPost)
+	if err != nil {
+		panic(err)
+	}
+	defer response.Body.Close()
+
+	bodyResponse, _ := io.ReadAll(response.Body)
+	fmt.Fprintln(res, "Categoría creada correctamente:")
+	fmt.Fprintln(res, string(bodyResponse))
+}
+
+func ClienteHttp_EditCategorie(res http.ResponseWriter, req *http.Request) {
+	params := mux.Vars(req)
+
+	idToEdit := params["id"]
+	newCategorie := Categoria{Nombre: "Mi categoria Valentin modificada 2"}
+
+	jsonData, err := json.Marshal(newCategorie)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(idToEdit)
+	fmt.Println(bytes.NewBuffer(jsonData))
+	reqPut, err := http.NewRequest("PUT", "https://www.api.tamila.cl/api/categorias/"+idToEdit, bytes.NewBuffer(jsonData))
+	if err != nil {
+		panic(err)
+	}
+
+	reqPut.Header.Set("Authorization", Token)
+	reqPut.Header.Set("Content-Type", "application/json")
+
+	cliente := &http.Client{}
+	response, err := cliente.Do(reqPut)
+	if err != nil {
+		panic(err)
+	}
+	defer response.Body.Close()
+
+	responseBody, _ := io.ReadAll(response.Body)
+	fmt.Fprintln(res, "Categoria modifcada exitosamente!")
+	fmt.Println("Status code:", response.StatusCode)
+	fmt.Println("Respuesta del servidor:", string(responseBody))
 }
