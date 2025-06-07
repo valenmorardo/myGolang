@@ -2,10 +2,10 @@ package models
 
 
 type Cliente struct {
-	Id int
-	Nombre string
-	Correo string
-	Telefono string
+	Id       int    `json:"id"`
+	Nombre   string `json:"nombre"`
+	Correo   string `json:"correo"`
+	Telefono string `json:"telefono"`
 }
 
 type Clientes []Cliente
