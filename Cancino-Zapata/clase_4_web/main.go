@@ -43,6 +43,9 @@ func main() {
 	mux.HandleFunc("/cliente-http/edit-categorie/{id:[0-9]+}", routes.ClienteHttp_EditCategorie)
 	mux.HandleFunc("/cliente-http/delete-categorie/{id:[0-9]+}", routes.ClienteHttp_DeleteCategorie)
 
+	//rutas para req a la bd
+	mux.HandleFunc("/mysql-get", routes.Mysql_get)
+
 	envData := utils.GetEnvData()
 
 	server := &http.Server{
