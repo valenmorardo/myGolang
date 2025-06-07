@@ -142,7 +142,7 @@ func ClienteHttp_GetCategories(res http.ResponseWriter, req *http.Request) {
 
 func ClienteHttp_PostCategorie(res http.ResponseWriter, req *http.Request) {
 	// Creo mi categoria
-	miCategoria := Categoria{Nombre: "Voy a ser el mejor programador de Golang!"}
+	miCategoria := Categoria{Nombre: "Voy a ser el mejor programador de Golang! Hi Gopher"}
 
 	// a la categoria que esta en un tipo struct lo paso a json para usarlo como body para la req
 	jsonData, err := json.Marshal(miCategoria)
@@ -156,7 +156,7 @@ func ClienteHttp_PostCategorie(res http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 	reqPost.Header.Set("Authorization", Token)
-	// reqPost.Header.Set("Content-Type", "application/json")
+	reqPost.Header.Set("Content-Type", "application/json")
 
 	// Creo el cliente para que haga la req
 	cliente := &http.Client{}
@@ -175,7 +175,7 @@ func ClienteHttp_EditCategorie(res http.ResponseWriter, req *http.Request) {
 	params := mux.Vars(req)
 
 	idToEdit := params["id"]
-	newCategorie := Categoria{Nombre: "Mi categoria Valentin modificada 2"}
+	newCategorie := Categoria{Nombre: "Mi categoria Valentin modificada 312"}
 
 	jsonData, err := json.Marshal(newCategorie)
 	if err != nil {
@@ -202,4 +202,28 @@ func ClienteHttp_EditCategorie(res http.ResponseWriter, req *http.Request) {
 	fmt.Fprintln(res, "Categoria modifcada exitosamente!")
 	fmt.Println("Status code:", response.StatusCode)
 	fmt.Println("Respuesta del servidor:", string(responseBody))
+}
+
+func ClienteHttp_DeleteCategorie(res http.ResponseWriter, req *http.Request) {
+	params := mux.Vars(req)
+	idToDelete := params["id"]
+
+	reqDel, err := http.NewRequest("DELETE", "https://www.api.tamila.cl/api/categorias/"+idToDelete, nil)
+	if err != nil {
+		panic(err)
+	}
+	reqDel.Header.Set("Authorization", Token)
+	reqDel.Header.Set("Content-Type", "application/json")
+
+	cliente := &http.Client{}
+	response, err := cliente.Do(reqDel)
+	if err != nil {
+		panic(err)
+	}
+	defer response.Body.Close()
+
+	responseBody, _ := io.ReadAll(response.Body)
+	fmt.Println(string(responseBody))
+	fmt.Fprintf(res, "Categoria con ID: %v eliminada correctamente\n", idToDelete)
+	res.Write(responseBody)
 }

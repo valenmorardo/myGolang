@@ -39,8 +39,9 @@ func main() {
 
 	// ruta para hace request a otro endpoint
 	mux.HandleFunc("/cliente-http/get-categories", routes.ClienteHttp_GetCategories).Methods("GET")
-	mux.HandleFunc("/cliente-http/post-categorie", routes.ClienteHttp_PostCategorie).Methods("POST")
+	mux.HandleFunc("/cliente-http/post-categorie", routes.ClienteHttp_PostCategorie)
 	mux.HandleFunc("/cliente-http/edit-categorie/{id:[0-9]+}", routes.ClienteHttp_EditCategorie)
+	mux.HandleFunc("/cliente-http/delete-categorie/{id:[0-9]+}", routes.ClienteHttp_DeleteCategorie)
 
 	envData := utils.GetEnvData()
 
