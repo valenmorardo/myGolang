@@ -46,6 +46,7 @@ func main() {
 	//rutas para req a la bd
 	mux.HandleFunc("/mysql-get", routes.Mysql_get)
 	mux.HandleFunc("/mysql-create", routes.Mysql_create)
+	mux.HandleFunc("/mysql-edit/{id:[0-9]+}", routes.Mysql_editar)
 
 	envData := utils.GetEnvData()
 

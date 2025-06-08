@@ -3,6 +3,7 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	//"fmt"
 	"net/http"
@@ -10,6 +11,8 @@ import (
 	"clase_4_web/conectar"
 	"clase_4_web/models"
 	"clase_4_web/utils"
+
+	"github.com/gorilla/mux"
 	//"clase_4_web/utils"
 )
 
@@ -71,4 +74,30 @@ func Mysql_create(res http.ResponseWriter, req *http.Request) {
 	newClient.Id = int(lastId)
 
 	utils.SendResponse(res, http.StatusOK, true, "Cliente registrado correctamente", newClient, nil)
+}
+
+func Mysql_editar(res http.ResponseWriter, req *http.Request) {
+	conectar.Conectar()
+	defer conectar.Desconectar()
+
+	clientIdToEdit := mux.Vars(req)["id"]
+
+	newDataClient := models.Cliente{}
+
+	err := json.NewDecoder(req.Body).Decode(&newDataClient)
+	if err != nil {
+		http.Error(res, "Error al obtener datos del cliente.", http.StatusInternalServerError)
+	}
+
+	sqlQuery := "UPDATE clientes set nombre=?, correo=?, telefono=? where id=?;"
+	_, err = conectar.Db.Exec(sqlQuery, newDataClient.Nombre, newDataClient.Correo, newDataClient.Telefono, clientIdToEdit)
+	if err != nil {
+		fmt.Println("Error al crear cliente.", err)
+		return
+	}
+	newDataClient.Id, err = strconv.Atoi(clientIdToEdit)
+	if err != nil {
+		http.Error(res, "ID Invalido.", http.StatusBadRequest)
+	}
+	utils.SendResponse(res, http.StatusOK, true, "Cliente actualizado correctamente.", newDataClient, nil)
 }
