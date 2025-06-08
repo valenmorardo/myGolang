@@ -47,6 +47,7 @@ func main() {
 	mux.HandleFunc("/mysql-get", routes.Mysql_get)
 	mux.HandleFunc("/mysql-create", routes.Mysql_create)
 	mux.HandleFunc("/mysql-edit/{id:[0-9]+}", routes.Mysql_editar)
+	mux.HandleFunc("/mysql-delete/{id:[0-9]+}", routes.Mysql_delete)
 
 	envData := utils.GetEnvData()
 

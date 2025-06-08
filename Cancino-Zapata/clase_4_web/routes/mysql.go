@@ -3,6 +3,7 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"strconv"
 
 	//"fmt"
@@ -100,4 +101,27 @@ func Mysql_editar(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, "ID Invalido.", http.StatusBadRequest)
 	}
 	utils.SendResponse(res, http.StatusOK, true, "Cliente actualizado correctamente.", newDataClient, nil)
+}
+
+func Mysql_delete(res http.ResponseWriter, req *http.Request) {
+	conectar.Conectar()
+	defer conectar.Desconectar()
+
+	clientIdToDelete := mux.Vars(req)["id"]
+
+	sqlQuery := "DELETE FROM clientes where id=?;"
+	result, err := conectar.Db.Exec(sqlQuery, clientIdToDelete)
+	if err != nil {
+		http.Error(res, "Error al eliminar cliente", http.StatusInternalServerError)
+	}
+	rowsAffec, err := result.RowsAffected()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if rowsAffec == 0 {
+		utils.SendResponse(res, http.StatusBadRequest, true, "No se encontro un cliente con ese ID", nil, nil)
+		return
+	}
+	msgRes := fmt.Sprintf("Se elimino el cliente con id: %v", clientIdToDelete)
+	utils.SendResponse(res, http.StatusOK, true, msgRes, nil, nil)
 }
