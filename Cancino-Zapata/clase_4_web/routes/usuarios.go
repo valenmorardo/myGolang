@@ -1,7 +1,9 @@
 package routes
 
 import (
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"clase_4_web/conectar"
@@ -67,4 +69,70 @@ func UserRegister(res http.ResponseWriter, req *http.Request) {
 	}
 	newUser.Id = int(lastId)
 	utils.SendResponse(res, http.StatusOK, true, "Usuario creado correctamente", newUser, nil)
+}
+
+type userLogin struct {
+	Correo   string `json:"correo"`
+	Password string `json:"password"`
+}
+type userLogged struct {
+	Id       int    `json:"id"`
+	Nombre   string `json:"nombre"`
+	Correo   string `json:"correo"`
+	Telefono string `json:"telefono"`
+}
+
+func isUserLoginDataValid(user userLogin) bool {
+	if user.Correo == "" || user.Password == "" {
+		return false
+	}
+	return true
+}
+
+func UserLogin(res http.ResponseWriter, req *http.Request) {
+	userLoginData := userLogin{}
+	err := json.NewDecoder(req.Body).Decode(&userLoginData)
+	if err != nil {
+		utils.SendResponse(res, http.StatusBadRequest, false, "Error al obtener datos del usuario.", nil, err.Error())
+		return
+	}
+
+	if !isUserLoginDataValid(userLoginData) {
+		utils.SendResponse(res, http.StatusBadRequest, false, "ERROR: Todos los campos son obligatorios.", nil, "Error.")
+		return
+	}
+
+	conectar.Conectar()
+	defer conectar.Desconectar()
+
+	sqlQuery := "SELECT id, nombre, correo, telefono, password FROM usuarios WHERE correo=?;"
+	row := conectar.Db.QueryRow(sqlQuery, userLoginData.Correo)
+	userFounded := models.Usuario{}
+	err = row.Scan(&userFounded.Id, &userFounded.Nombre, &userFounded.Correo, &userFounded.Telefono, &userFounded.Password)
+	if err == sql.ErrNoRows {
+		utils.SendResponse(res, http.StatusUnauthorized, false, "Correo o contraseña inválidos", nil, nil)
+		return
+	} else if err != nil {
+		utils.SendResponse(res, http.StatusInternalServerError, false, "Fallo a la hora de logear", nil, err.Error())
+		return
+	}
+	fmt.Println(userLoginData)
+	// comparar los hash pw
+	passwordBytes := []byte(userLoginData.Password)
+	passwordBytesDB := []byte(userFounded.Password)
+
+	err = bcrypt.CompareHashAndPassword(passwordBytesDB, passwordBytes)
+	if err != nil {
+		utils.SendResponse(res, http.StatusUnauthorized, false, "Correo o contraseña inválidos", nil, nil)
+		return
+	}
+
+	userLoggedRes := userLogged{
+		Id:       userFounded.Id,
+		Nombre:   userFounded.Nombre,
+		Correo:   userFounded.Correo,
+		Telefono: userFounded.Telefono,
+	}
+
+	utils.SendResponse(res, http.StatusOK, true, "Usuario Loggeado correctamente.", userLoggedRes, nil)
 }

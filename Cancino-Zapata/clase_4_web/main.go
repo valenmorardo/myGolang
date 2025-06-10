@@ -51,6 +51,7 @@ func main() {
 
 	// rutas tabla USUARIOS db 
 	mux.HandleFunc("/user-register", routes.UserRegister)
+	mux.HandleFunc("/user-login", routes.UserLogin)
 
 	envData := utils.GetEnvData()
 
