@@ -1,6 +1,8 @@
 module clase_4_web
 
-go 1.22.0
+go 1.23.0
+
+toolchain go1.23.10
 
 require (
 	github.com/gorilla/mux v1.8.1
@@ -16,5 +18,6 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/pilu/config v0.0.0-20131214182432-3eb99e6c0b9a // indirect
 	github.com/pilu/fresh v0.0.0-20240621171608-8d1fef547a99 // indirect
-	golang.org/x/sys v0.29.0 // indirect
+	golang.org/x/crypto v0.39.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
 )

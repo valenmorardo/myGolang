@@ -49,6 +49,9 @@ func main() {
 	mux.HandleFunc("/mysql-edit/{id:[0-9]+}", routes.Mysql_editar)
 	mux.HandleFunc("/mysql-delete/{id:[0-9]+}", routes.Mysql_delete)
 
+	// rutas tabla USUARIOS db 
+	mux.HandleFunc("/user-register", routes.UserRegister)
+
 	envData := utils.GetEnvData()
 
 	server := &http.Server{
