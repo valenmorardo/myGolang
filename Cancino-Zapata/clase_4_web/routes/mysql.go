@@ -22,7 +22,7 @@ func Mysql_get(res http.ResponseWriter, req *http.Request) {
 	conectar.Conectar()
 	defer conectar.Desconectar()
 
-	sqlQuery := "SELECT id, nombre, correo, telefono FROM clientes order by id desc"
+	sqlQuery := "SELECT ID, nombre, correo, telefono FROM clientes order by id desc"
 	clientes := models.Clientes{}
 
 	datos, err := conectar.Db.Query(sqlQuery)
@@ -33,7 +33,7 @@ func Mysql_get(res http.ResponseWriter, req *http.Request) {
 
 	for datos.Next() {
 		cliente := models.Cliente{}
-		err := datos.Scan(&cliente.Id, &cliente.Nombre, &cliente.Correo, &cliente.Telefono)
+		err := datos.Scan(&cliente.ID, &cliente.Nombre, &cliente.Correo, &cliente.Telefono)
 		if err != nil {
 			http.Error(res, "Error al leer datos.", http.StatusInternalServerError)
 		}
@@ -68,11 +68,11 @@ func Mysql_create(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	lastId, err := result.LastInsertId()
+	lastID, err := result.LastInsertId()
 	if err != nil {
 		fmt.Println("Error al obtener el id del cliente.", err)
 	}
-	newClient.Id = int(lastId)
+	newClient.ID = int(lastID)
 
 	utils.SendResponse(res, http.StatusOK, true, "Cliente registrado correctamente", newClient, nil)
 }
@@ -96,7 +96,7 @@ func Mysql_editar(res http.ResponseWriter, req *http.Request) {
 		fmt.Println("Error al crear cliente.", err)
 		return
 	}
-	newDataClient.Id, err = strconv.Atoi(clientIdToEdit)
+	newDataClient.ID, err = strconv.Atoi(clientIdToEdit)
 	if err != nil {
 		http.Error(res, "ID Invalido.", http.StatusBadRequest)
 	}
@@ -107,10 +107,10 @@ func Mysql_delete(res http.ResponseWriter, req *http.Request) {
 	conectar.Conectar()
 	defer conectar.Desconectar()
 
-	clientIdToDelete := mux.Vars(req)["id"]
+	clientIDToDelete := mux.Vars(req)["id"]
 
 	sqlQuery := "DELETE FROM clientes where id=?;"
-	result, err := conectar.Db.Exec(sqlQuery, clientIdToDelete)
+	result, err := conectar.Db.Exec(sqlQuery, clientIDToDelete)
 	if err != nil {
 		http.Error(res, "Error al eliminar cliente", http.StatusInternalServerError)
 	}
@@ -122,6 +122,6 @@ func Mysql_delete(res http.ResponseWriter, req *http.Request) {
 		utils.SendResponse(res, http.StatusBadRequest, true, "No se encontro un cliente con ese ID", nil, nil)
 		return
 	}
-	msgRes := fmt.Sprintf("Se elimino el cliente con id: %v", clientIdToDelete)
+	msgRes := fmt.Sprintf("Se elimino el cliente con id: %v", clientIDToDelete)
 	utils.SendResponse(res, http.StatusOK, true, msgRes, nil, nil)
 }

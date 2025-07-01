@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"clase_4_web/conectar"
+	"clase_4_web/middlewares"
 	"clase_4_web/models"
 	"clase_4_web/utils"
 
@@ -62,43 +63,35 @@ func UserRegister(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	newUser.Password = string(hashedPassword)
-	lastId, err := result.LastInsertId()
+	lastID, err := result.LastInsertId()
 	if err != nil {
 		utils.SendResponse(res, http.StatusInternalServerError, false, "Fallo a la hora de registrar usuario.", nil, "ERROR")
 		return
 	}
-	newUser.Id = int(lastId)
+	newUser.ID = int(lastID)
 	utils.SendResponse(res, http.StatusOK, true, "Usuario creado correctamente", newUser, nil)
 }
 
-type userLogin struct {
-	Correo   string `json:"correo"`
-	Password string `json:"password"`
-}
 type userLogged struct {
-	Id       int    `json:"id"`
+	ID       int    `json:"id"`
 	Nombre   string `json:"nombre"`
 	Correo   string `json:"correo"`
 	Telefono string `json:"telefono"`
 }
 
-func isUserLoginDataValid(user userLogin) bool {
-	if user.Correo == "" || user.Password == "" {
-		return false
-	}
-	return true
-}
-
 func UserLogin(res http.ResponseWriter, req *http.Request) {
-	userLoginData := userLogin{}
-	err := json.NewDecoder(req.Body).Decode(&userLoginData)
-	if err != nil {
-		utils.SendResponse(res, http.StatusBadRequest, false, "Error al obtener datos del usuario.", nil, err.Error())
+	userLoginData := models.UserLogin{}
+
+	loginInput := req.Context().Value(middlewares.LoginInputKey)
+	fmt.Println(loginInput)
+	if loginInput == nil {
+		utils.SendResponse(res, http.StatusBadRequest, false, "Error al obtener datos del usuario.", nil, "Error.")
 		return
 	}
 
-	if !isUserLoginDataValid(userLoginData) {
-		utils.SendResponse(res, http.StatusBadRequest, false, "ERROR: Todos los campos son obligatorios.", nil, "Error.")
+	userLoginData, ok := loginInput.(models.UserLogin)
+	if !ok {
+		utils.SendResponse(res, http.StatusInternalServerError, false, "Error interno al procesar login.", nil, "Error.")
 		return
 	}
 
@@ -108,7 +101,7 @@ func UserLogin(res http.ResponseWriter, req *http.Request) {
 	sqlQuery := "SELECT id, nombre, correo, telefono, password FROM usuarios WHERE correo=?;"
 	row := conectar.Db.QueryRow(sqlQuery, userLoginData.Correo)
 	userFounded := models.Usuario{}
-	err = row.Scan(&userFounded.Id, &userFounded.Nombre, &userFounded.Correo, &userFounded.Telefono, &userFounded.Password)
+	err := row.Scan(&userFounded.ID, &userFounded.Nombre, &userFounded.Correo, &userFounded.Telefono, &userFounded.Password)
 	if err == sql.ErrNoRows {
 		utils.SendResponse(res, http.StatusUnauthorized, false, "Correo o contraseña inválidos", nil, nil)
 		return
@@ -128,11 +121,11 @@ func UserLogin(res http.ResponseWriter, req *http.Request) {
 	}
 
 	userLoggedRes := userLogged{
-		Id:       userFounded.Id,
+		ID:       userFounded.ID,
 		Nombre:   userFounded.Nombre,
 		Correo:   userFounded.Correo,
 		Telefono: userFounded.Telefono,
 	}
-
+	fmt.Println("PASE EL todos los metodos de la ruta y ahora te doy la respuesta")
 	utils.SendResponse(res, http.StatusOK, true, "Usuario Loggeado correctamente.", userLoggedRes, nil)
 }

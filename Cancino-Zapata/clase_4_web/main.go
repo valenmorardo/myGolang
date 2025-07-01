@@ -11,7 +11,7 @@ import (
 
 	"clase_4_web/routes"
 	"clase_4_web/utils"
-
+	"clase_4_web/middlewares"
 	"github.com/gorilla/mux"
 )
 
@@ -36,22 +36,21 @@ func main() {
 	mux.HandleFunc("/params-querystring", routes.ParamsQueryString)
 	mux.HandleFunc("/estructuras", routes.Estructuras)
 
-
 	// ruta para hace request a otro endpoint
 	mux.HandleFunc("/cliente-http/get-categories", routes.ClienteHttp_GetCategories).Methods("GET")
 	mux.HandleFunc("/cliente-http/post-categorie", routes.ClienteHttp_PostCategorie)
 	mux.HandleFunc("/cliente-http/edit-categorie/{id:[0-9]+}", routes.ClienteHttp_EditCategorie)
 	mux.HandleFunc("/cliente-http/delete-categorie/{id:[0-9]+}", routes.ClienteHttp_DeleteCategorie)
 
-	//rutas para req a la bd
+	// rutas para req a la bd
 	mux.HandleFunc("/mysql-get", routes.Mysql_get)
 	mux.HandleFunc("/mysql-create", routes.Mysql_create)
 	mux.HandleFunc("/mysql-edit/{id:[0-9]+}", routes.Mysql_editar)
 	mux.HandleFunc("/mysql-delete/{id:[0-9]+}", routes.Mysql_delete)
 
-	// rutas tabla USUARIOS db 
+	// rutas tabla USUARIOS db
 	mux.HandleFunc("/user-register", routes.UserRegister)
-	mux.HandleFunc("/user-login", routes.UserLogin)
+	mux.Handle("/user-login", middlewares.ValidateLoginData(http.HandlerFunc(routes.UserLogin)))
 
 	envData := utils.GetEnvData()
 
