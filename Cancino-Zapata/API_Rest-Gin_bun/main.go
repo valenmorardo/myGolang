@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"api_gin_bun/routes"
 )
 
 func main() {
@@ -14,12 +15,13 @@ func main() {
 	router := gin.Default() // doy inicio al router de gin
 
 	// ruta get de ejemplo
-	router.GET(routePrefix+"hola", func(context *gin.Context) {
-		context.JSON(200, gin.H{
-			"message": "Hola desde GIN !!!",
-		})
-		
-	})
+	router.GET(routePrefix+"get", routes.EjemploGet)
+	router.POST(routePrefix+"post", routes.EjemploPost)
+	router.PUT(routePrefix+"put/:id",routes.EjemploPut)
+	router.DELETE(routePrefix+"delete", routes.EjemploDelete)
+
+	router.GET(routePrefix+"getParams/:id", routes.EjemploGetParams)
+
 	// variables de entorno
 	err := godotenv.Load()
 	if err != nil {
