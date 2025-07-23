@@ -2,16 +2,19 @@
 package connection
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
 
 	_ "github.com/lib/pq" // Importa el driver de PostgreSQL
 
+	"api_gin_bun/config"
+	"api_gin_bun/models"
+
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
-	"api_gin_bun/config"
-)	
+)
 
 var DB *bun.DB
 
@@ -25,15 +28,19 @@ func ConnectDB() {
 		config.CfgEnv.DBPort,
 	)
 
-	sqlDB, err := sql.Open("postgres", dsn)
+	sqlDB, err := sql.Open("postgres", dsn) // hago la conexion y creo la instancia de la conexion sql a postgres
 	if err != nil {
 		log.Fatalf("Error al abrir conexión: %v", err)
 	}
 
 	// Probamos si realmente conecta
-	if err := sqlDB.Ping(); err != nil {
+	if err = sqlDB.Ping(); err != nil {
 		log.Fatalf("Error al conectar a la DB: %v", err)
 	}
 
-	DB = bun.NewDB(sqlDB, pgdialect.New())
+	DB = bun.NewDB(sqlDB, pgdialect.New())                        // creo una instancia bun con el dialecto de postgre pasandole la instancia sql que cree antes con
+	err = DB.ResetModel(context.TODO(), &models.TematicasModel{}) // esto le dice a bun revisa y registra y valida este modelo internamente. Resetea la cache interna
+	if err != nil {
+		panic(err)
+	}
 }
