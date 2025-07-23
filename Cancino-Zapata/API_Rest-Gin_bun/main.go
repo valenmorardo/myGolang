@@ -21,15 +21,15 @@ func main() {
 
 	// static files
 	router.Static("/public", "./public")
-	// ruta get de ejemplo
+	// rutas de ejemplo
 	router.GET(routePrefix+"get", routes.EjemploGet)
 	router.POST(routePrefix+"post", routes.EjemploPost)
 	router.PUT(routePrefix+"put/:id", routes.EjemploPut)
 	router.DELETE(routePrefix+"delete", routes.EjemploDelete)
-
+	// query & params routes example
 	router.GET(routePrefix+"getParams/:id", routes.EjemploGetParams)
 	router.GET(routePrefix+"queryString/", routes.EjemploGetQueryString)
-
+	// upload file route example
 	router.POST(routePrefix+"upload", routes.EjemploUpload)
 
 	fmt.Printf("\n\nCorriendo server de GIN en: localhost:%v\n\n", config.CfgEnv.SvPort)
