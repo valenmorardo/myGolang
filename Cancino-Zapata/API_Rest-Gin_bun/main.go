@@ -24,6 +24,8 @@ func main() {
 	router.GET(routePrefix+"getParams/:id", routes.EjemploGetParams)
 	router.GET(routePrefix+"queryString/", routes.EjemploGetQueryString)
 
+	router.POST(routePrefix+"upload", routes.EjemploUpload)
+
 	// variables de entorno
 	err := godotenv.Load()
 	if err != nil {

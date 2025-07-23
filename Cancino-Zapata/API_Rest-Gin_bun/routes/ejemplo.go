@@ -4,11 +4,13 @@ package routes
 import (
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"strconv"
 
 	"api_gin_bun/dto"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func EjemploGet(ctx *gin.Context) {
@@ -16,7 +18,7 @@ func EjemploGet(ctx *gin.Context) {
 	auth := ctx.GetHeader("authorization")
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Metodo GET con GIN !!!!!!!",
-		"Auth": auth,
+		"Auth":    auth,
 	})
 }
 
@@ -31,7 +33,7 @@ func EjemploPost(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Metodo post con GIN",
-		"data": body,
+		"data":    body,
 	})
 }
 
@@ -73,5 +75,29 @@ func EjemploGetQueryString(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Metodo GET with PARAMS",
 		"param":   id,
+	})
+}
+
+func EjemploUpload(ctx *gin.Context) {
+	file, err := ctx.FormFile("foto")
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "archivo no válido", "detail": err.Error(),
+		})
+		return
+	}
+
+	ext := filepath.Ext(file.Filename) // incluye el punto: ".jpg"
+	filename := uuid.New().String() + ext
+	dst := filepath.Join("public", "uploads", "fotos", filename)
+
+	if err := ctx.SaveUploadedFile(file, dst); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "no se pudo guardar el archivo"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message":  "foto guardada correctamente",
+		"filename": filename,
 	})
 }
