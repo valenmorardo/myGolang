@@ -8,7 +8,7 @@ import (
 
 func Migrate() {
 	DB.NewCreateTable().
-		Model((*models.TematicasModel)(nil)).
+		Model((*models.TematicaModel)(nil)).
 		IfNotExists().
 		Exec(context.TODO())
 }

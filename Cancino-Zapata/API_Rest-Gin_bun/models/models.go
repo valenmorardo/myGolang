@@ -6,7 +6,7 @@ import (
 	"github.com/uptrace/bun"
 )
 
-type TematicasModel struct {
+type TematicaModel struct {
 	bun.BaseModel `bun:"table:tematicas,alias:t"`
 
 	ID     int64  `bun:",pk,autoincrement" json:"id"`
