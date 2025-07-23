@@ -8,10 +8,14 @@ import (
 
 	_ "github.com/lib/pq" // Importa el driver de PostgreSQL
 
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/pgdialect"
 	"api_gin_bun/config"
 )	
 
-func ConnectDB() *sql.DB {
+var DB *bun.DB
+
+func ConnectDB() {
 	dsn := fmt.Sprintf(
 		"user=%s password=%s dbname=%s host=%s port=%s sslmode=disable",
 		config.CfgEnv.DBUser,
@@ -21,15 +25,15 @@ func ConnectDB() *sql.DB {
 		config.CfgEnv.DBPort,
 	)
 
-	db, err := sql.Open("postgres", dsn)
+	sqlDB, err := sql.Open("postgres", dsn)
 	if err != nil {
 		log.Fatalf("Error al abrir conexión: %v", err)
 	}
 
 	// Probamos si realmente conecta
-	if err := db.Ping(); err != nil {
+	if err := sqlDB.Ping(); err != nil {
 		log.Fatalf("Error al conectar a la DB: %v", err)
 	}
 
-	return db
+	DB = bun.NewDB(sqlDB, pgdialect.New())
 }

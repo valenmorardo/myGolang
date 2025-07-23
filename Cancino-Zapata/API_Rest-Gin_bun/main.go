@@ -11,8 +11,8 @@ import (
 )
 
 func main() {
-	db := connection.ConnectDB()
-	defer db.Close()
+	connection.ConnectDB()
+	defer connection.DB.Close()
 
 	gin.SetMode(gin.ReleaseMode)
 	routePrefix := "/api/"
