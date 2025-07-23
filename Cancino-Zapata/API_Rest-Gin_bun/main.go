@@ -14,11 +14,12 @@ func main() {
 	connection.ConnectDB()
 	defer connection.DB.Close()
 
+	connection.Migrate() // ejecuto migrate para crear las tablas
+
 	gin.SetMode(gin.ReleaseMode)
-	routePrefix := "/api/"
 
 	router := gin.Default() // doy inicio al router de gin
-
+	routePrefix := "/api/"
 	// static files
 	router.Static("/public", "./public")
 	// rutas de ejemplo
@@ -31,6 +32,9 @@ func main() {
 	router.GET(routePrefix+"queryString/", routes.EjemploGetQueryString)
 	// upload file route example
 	router.POST(routePrefix+"upload", routes.EjemploUpload)
+
+	// router para tematicas (DB)
+	router.GET(routePrefix+"tematicas", routes.TematicasGet)
 
 	fmt.Printf("\n\nCorriendo server de GIN en: localhost:%v\n\n", config.CfgEnv.SvPort)
 
