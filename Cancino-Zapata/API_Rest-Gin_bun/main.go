@@ -15,6 +15,8 @@ func main() {
 
 	router := gin.Default() // doy inicio al router de gin
 
+	// static files
+	router.Static("/public", "./public")
 	// ruta get de ejemplo
 	router.GET(routePrefix+"get", routes.EjemploGet)
 	router.POST(routePrefix+"post", routes.EjemploPost)
