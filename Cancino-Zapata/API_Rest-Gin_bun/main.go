@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	gin.SetMode(gin.ReleaseMode)
 	routePrefix := "/api/"
 
 	router := gin.Default() // doy inicio al router de gin
@@ -21,6 +22,7 @@ func main() {
 	router.DELETE(routePrefix+"delete", routes.EjemploDelete)
 
 	router.GET(routePrefix+"getParams/:id", routes.EjemploGetParams)
+	router.GET(routePrefix+"queryString/", routes.EjemploGetQueryString)
 
 	// variables de entorno
 	err := godotenv.Load()

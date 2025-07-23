@@ -2,46 +2,64 @@
 package routes
 
 import (
+	"fmt"
+	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func EjemploGet(context *gin.Context) {
-	context.JSON(200, gin.H{
-		"message": "Metodo GET con GIN !!!",
+func EjemploGet(ctx *gin.Context) {
+
+	ctx.Writer.Header().Set("Custom-Header", "I am a custom header!")
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Metodo GET con GIN !!!!!!!",
 	})
 }
 
 func EjemploPost(ctx *gin.Context) {
-	ctx.JSON(200, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Metodo post con GIN",
 	})
 }
 
 func EjemploPut(ctx *gin.Context) {
-	ctx.JSON(200, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Metodo put con GIN",
 	})
 }
 
 func EjemploDelete(ctx *gin.Context) {
-	ctx.JSON(200, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"message": "metodo delete con GIN!",
 	})
 }
 
 func EjemploGetParams(ctx *gin.Context) {
-	idStr := ctx.Param("id")
-	id, err := strconv.Atoi(idStr)
+	fmt.Println()
+	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		ctx.JSON(400, gin.H{
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"Error":   "ID Invalido",
 			"message": err,
 		})
 	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Metodo GET with PARAMS",
+		"param":   id,
+		
+	})
+}
 
-	ctx.JSON(200, gin.H{
+func EjemploGetQueryString(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Query("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"Error":   "ID Invalido",
+			"message": err,
+		})
+	}
+	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Metodo GET with PARAMS",
 		"param":   id,
 	})
