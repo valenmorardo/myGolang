@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"api_gin_bun/connection"
+	"api_gin_bun/dto"
 	"api_gin_bun/models"
 
 	"github.com/gin-gonic/gin"
@@ -42,7 +43,7 @@ func TematicasGetByID(ctx *gin.Context) {
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "No se encontro la tematica",
+				"error":   "No se encontro la tematica",
 				"infoErr": err.Error(),
 			})
 		} else {
@@ -57,5 +58,33 @@ func TematicasGetByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"msg":  "Temática encontrada",
 		"data": tematica,
+	})
+}
+
+func TematicasCreate(ctx *gin.Context) {
+	var body dto.TematicaDto
+
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"msg":   "Error.",
+			"error": err.Error(),
+		})
+		return
+	}
+
+	newTematica := models.TematicaModel{Nombre: body.Nombre, Slug: body.Nombre+"-slug"}
+
+	_, err := connection.DB.NewInsert().Model(&newTematica).Exec(ctx.Request.Context())
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"msg":   "Error",
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{
+		"msg":"Succesfull",
+		"data":newTematica,
 	})
 }

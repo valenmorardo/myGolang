@@ -36,6 +36,7 @@ func main() {
 	// router para tematicas (DB)
 	router.GET(routePrefix+"tematicas", routes.TematicasGet)
 	router.GET(routePrefix+"tematicas/:id", routes.TematicasGetByID)
+	router.POST(routePrefix+"tematica-create", routes.TematicasCreate)
 
 	fmt.Printf("\n\nCorriendo server de GIN en: localhost:%v\n\n", config.CfgEnv.SvPort)
 
