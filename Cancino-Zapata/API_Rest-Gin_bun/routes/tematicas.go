@@ -91,7 +91,7 @@ func TematicasCreate(ctx *gin.Context) {
 	})
 }
 
-func TematicasEdit(ctx *gin.Context) {
+func TematicasEditByID(ctx *gin.Context) {
 	var body dto.TematicaDto
 
 	if err := ctx.ShouldBindJSON(&body); err != nil {
@@ -131,5 +131,33 @@ func TematicasEdit(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"msg":  "Successfull. Tematica modificada",
 		"data": tematicaModifed,
+	})
+}
+
+func TematicasDeleteByID(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "ID Invalido",
+			"info":  err.Error(),
+		})
+		return
+	}
+	res, err := connection.DB.NewDelete().Model((*models.TematicaModel)(nil)).Where("id=?", id).Exec(ctx.Request.Context())
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"msg":   "Error",
+			"error": err.Error(),
+		})
+		return
+	}
+	if rowsAffected, _ := res.RowsAffected(); rowsAffected == 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"msg": "ERROR. No se encontro tematica con ese ID.",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"msg": "Successfull. Tematica eliminada",
 	})
 }
