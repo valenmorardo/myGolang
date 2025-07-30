@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+
+	//	"fmt"
 	"net/http"
 	"strconv"
 
@@ -72,7 +74,7 @@ func TematicasCreate(ctx *gin.Context) {
 		return
 	}
 
-	newTematica := models.TematicaModel{Nombre: body.Nombre, Slug: body.Nombre+"-slug"}
+	newTematica := models.TematicaModel{Nombre: body.Nombre, Slug: body.Nombre + "-slug"}
 
 	_, err := connection.DB.NewInsert().Model(&newTematica).Exec(ctx.Request.Context())
 	if err != nil {
@@ -84,7 +86,50 @@ func TematicasCreate(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{
-		"msg":"Succesfull",
-		"data":newTematica,
+		"msg":  "Succesfull",
+		"data": newTematica,
+	})
+}
+
+func TematicasEdit(ctx *gin.Context) {
+	var body dto.TematicaDto
+
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"msg":   "Error.",
+			"error": err.Error(),
+		})
+		return
+	}
+
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "ID Invalido",
+			"info":  err.Error(),
+		})
+		return
+	}
+
+	// edtiar registro
+	tematicaModifed := models.TematicaModel{ID: int64(id), Nombre: body.Nombre, Slug: body.Nombre + "-"}
+	res, err := connection.DB.NewUpdate().Model(&tematicaModifed).WherePK().Exec(ctx.Request.Context())
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"msg":   "Error",
+			"error": err.Error(),
+		})
+		return
+	}
+	if rowsAffected, _ := res.RowsAffected(); rowsAffected == 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"msg": "ERROR. No se encontro tematica con ese ID.",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"msg":  "Successfull. Tematica modificada",
+		"data": tematicaModifed,
 	})
 }
