@@ -11,4 +11,10 @@ func Migrate() {
 		Model((*models.TematicaModel)(nil)).
 		IfNotExists().
 		Exec(context.TODO())
+
+	DB.NewCreateTable().
+		Model((*models.PeliculaModel)(nil)).
+		ForeignKey(`("tematica_id") REFERENCES "tematicas"("id") ON DELETE CASCADE`).
+		IfNotExists().
+		Exec(context.TODO())
 }
