@@ -14,6 +14,8 @@ import (
 	"strconv"
 
 	"api_gin_bun/connection"
+	"api_gin_bun/dto"
+
 	//"api_gin_bun/dto"
 	"api_gin_bun/models"
 
@@ -63,5 +65,49 @@ func PeliculasGetByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"msg":  "Pelicula encontrada",
 		"data": pelicula,
+	})
+}
+
+func PeliculasCreate(ctx *gin.Context) {
+	var body dto.PeliculaDto
+
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"msg":   "Error.",
+			"error": err.Error(),
+		})
+		return
+	}
+
+	newPelicula := models.PeliculaModel{Nombre: body.Nombre, Descripcion: body.Descripcion, Year: body.Year, TematicaID: body.TematicaID}
+
+	res, err := connection.DB.NewInsert().Model(&newPelicula).Exec(ctx.Request.Context())
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"msg":   "Error",
+			"error": err.Error(),
+		})
+		return
+	}
+	if rowsAffected, errRa := res.RowsAffected(); rowsAffected == 0 || errRa != nil{
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"msg":   "Error. No se pudo insertar la pelicula",
+			"error": errRa.Error(),
+		})
+		return
+	}
+
+	err = connection.DB.NewSelect().Model(&newPelicula).Relation("Tematica").Where("p.id = ?", newPelicula.ID).Scan(ctx.Request.Context())
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"msg":   "Película creada, pero error al cargar temática",
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{
+		"msg":  "Succesfull",
+		"data": newPelicula,
 	})
 }
