@@ -89,7 +89,7 @@ func PeliculasCreate(ctx *gin.Context) {
 		})
 		return
 	}
-	if rowsAffected, errRa := res.RowsAffected(); rowsAffected == 0 || errRa != nil{
+	if rowsAffected, errRa := res.RowsAffected(); rowsAffected == 0 || errRa != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"msg":   "Error. No se pudo insertar la pelicula",
 			"error": errRa.Error(),
@@ -109,5 +109,49 @@ func PeliculasCreate(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{
 		"msg":  "Succesfull",
 		"data": newPelicula,
+	})
+}
+
+func PeliculasUpdate(ctx *gin.Context) {
+	var body dto.PeliculaDto
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"msg":   "Error.",
+			"error": err.Error(),
+		})
+		return
+	}
+
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "ID Invalido",
+			"info":  err.Error(),
+		})
+		return
+	}
+
+	// editar registro
+	peliculaUpdated := models.PeliculaModel{
+		ID: int64(id), Nombre: body.Nombre, Descripcion: body.Descripcion, Year: body.Year, TematicaID: body.TematicaID,
+	}
+	res, err := connection.DB.NewUpdate().Model(&peliculaUpdated).WherePK().Exec(ctx.Request.Context())
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"msg":   "Error",
+			"error": err.Error(),
+		})
+		return
+	}
+	if rowsAffected, err := res.RowsAffected(); rowsAffected == 0 || err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"msg":   "Error. No se pudo actualizar la pelicula",
+			"error": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"msg":  "Pelicula actualizada correctamente",
+		"data": peliculaUpdated,
 	})
 }
