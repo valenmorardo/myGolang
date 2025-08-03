@@ -1,7 +1,7 @@
 package routes
 
 import (
-	//"fmt"
+	"fmt"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -21,7 +21,7 @@ func PeliculaFotoUpload(ctx *gin.Context) {
 			"error": "archivo no válido", "detail": err.Error(),
 		})
 		return
-	} 
+	}
 
 	ext := filepath.Ext(file.Filename) // incluye el punto: ".jpg"
 	filename := uuid.New().String() + ext
@@ -67,5 +67,38 @@ func PeliculaFotoUpload(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"message":  "foto de la pelicula guardada correctamente",
 		"filename": filename,
+	})
+}
+
+func PeliculaFotoGetByID(ctx *gin.Context) {
+	idPelicula, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "ID Invalido",
+			"info":  err.Error(),
+		})
+		return
+	}
+
+	var fotosPelicula []models.PeliculaFotoModel
+
+	err = connection.DB.NewSelect().Model(&fotosPelicula).Where("pelicula_id=?", idPelicula).Scan(ctx.Request.Context())
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"msg":   "Error",
+			"error": err.Error(),
+		})
+		return
+	}
+	if len(fotosPelicula) == 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"msg": fmt.Sprintf("No se encontraron fotos para la película con ID %v", idPelicula),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"datos": fotosPelicula,
+		"msg":   "Fotos encontradas",
 	})
 }

@@ -49,6 +49,7 @@ func main() {
 
 	// router para peliculas fotos
 	router.POST(routePrefix+"peliculas/fotos/:id", routes.PeliculaFotoUpload)
+	router.GET(routePrefix+"pelicula/:id/fotos", routes.PeliculaFotoGetByID)
 
 	fmt.Printf("\n\nCorriendo server de GIN en: localhost:%v\n\n", config.CfgEnv.SvPort)
 
