@@ -155,3 +155,41 @@ func PeliculasUpdate(ctx *gin.Context) {
 		"data": peliculaUpdated,
 	})
 }
+
+func PeliculasDelete(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"msg":   "Error. ID Invalido",
+			"error": err.Error(),
+		})
+		return
+	}
+	peliculaToDelete := models.PeliculaModel{ID: int64(id)}
+	res, err := connection.DB.NewDelete().Model(&peliculaToDelete).WherePK().Exec(ctx.Request.Context())
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"msg":   "Error",
+			"error": err.Error(),
+		})
+		return
+	}
+	ra, errRa := res.RowsAffected()
+	if errRa != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"msg":   "Error al verificar filas afectadas",
+			"error": errRa.Error(),
+		})
+		return
+	}
+	if ra == 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"msg": fmt.Sprintf("No se encontró ninguna película con ID: %v", id),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"msg": fmt.Sprintf("Pelicula con ID: %v, eliminada correctamente", id),
+	})
+}

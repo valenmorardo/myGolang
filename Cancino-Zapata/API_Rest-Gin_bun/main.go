@@ -45,6 +45,7 @@ func main() {
 	router.GET(routePrefix+"peliculas/:id", routes.PeliculasGetByID)
 	router.POST(routePrefix+"peliculas/create", routes.PeliculasCreate)
 	router.PUT(routePrefix+"peliculas/:id",routes.PeliculasUpdate)
+	router.DELETE(routePrefix+"peliculas/:id", routes.PeliculasDelete)
 
 	fmt.Printf("\n\nCorriendo server de GIN en: localhost:%v\n\n", config.CfgEnv.SvPort)
 
