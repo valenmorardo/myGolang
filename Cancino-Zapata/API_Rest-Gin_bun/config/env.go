@@ -15,6 +15,7 @@ type EnvStruct struct {
 	DBPassword string
 	DBHost     string
 	DBPort     string
+	SecretJWT  string
 }
 
 var CfgEnv *EnvStruct
@@ -34,5 +35,6 @@ func init() {
 		DBPassword: os.Getenv("DB_PASSWORD"),
 		DBHost:     os.Getenv("DB_HOST"),
 		DBPort:     os.Getenv("DB_PORT"),
+		SecretJWT:  os.Getenv("SECRET_JWT"),
 	}
 }
