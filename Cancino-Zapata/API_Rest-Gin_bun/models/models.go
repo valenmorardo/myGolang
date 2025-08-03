@@ -25,3 +25,13 @@ type PeliculaModel struct {
 	TematicaID int64         `bun:"tematica_id" json:"tematicaID"`
 	Tematica   TematicaModel `bun:"rel:belongs-to,join:tematica_id=id" json:"tematica"`
 }
+
+type PeliculaFotoModel struct {
+	bun.BaseModel `bun:"table:peliculas_fotos,alias:p"`
+
+	ID     int64  `bun:",pk,autoincrement" json:"id"`
+	Nombre string `bun:"nombre,notnull" json:"nombre"`
+
+	PeliculaID int64         `bun:"pelicula_id" json:"peliculaID"`
+	Pelicula   PeliculaModel `bun:"rel:belongs-to,join:pelicula_id=id" json:"pelicula"`
+}
