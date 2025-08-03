@@ -17,7 +17,12 @@ type PeliculaDto struct {
 }
 
 type UsuarioDto struct {
-	Nombre      string `json:"nombre" binding:"required"`
+	Nombre   string `json:"nombre" binding:"required"`
 	Password string `json:"password" binding:"required"`
-	Email string `json:"email" binding:"required"`
+	Email    string `json:"email" binding:"required"`
+}
+
+type UsuarioLoginDto struct {
+	Password string `json:"password" binding:"required"`
+	Email    string `json:"email" binding:"required"`
 }
