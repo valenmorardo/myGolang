@@ -35,3 +35,11 @@ type PeliculaFotoModel struct {
 	PeliculaID int64         `bun:"pelicula_id" json:"peliculaID"`
 	Pelicula   PeliculaModel `bun:"rel:belongs-to,join:pelicula_id=id" json:"pelicula"`
 }
+
+type UserModel struct {
+	bun.BaseModel `bun:"table:user,alias:u"`
+
+	ID       int64  `bun:",pk,autoincrement" json:"id"`
+	Nombre   string `bun:"nombre,notnull" json:"nombre"`
+	Password string `bun:"password,notnull" json:"password"`
+}

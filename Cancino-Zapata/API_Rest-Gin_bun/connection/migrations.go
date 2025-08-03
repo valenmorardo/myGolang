@@ -23,4 +23,9 @@ func Migrate() {
 		ForeignKey(`("pelicula_id") REFERENCES "peliculas"("id") ON DELETE CASCADE`).
 		IfNotExists().
 		Exec(context.TODO())
+
+	DB.NewCreateTable().
+		Model((*models.UserModel)(nil)).
+		IfNotExists().
+		Exec(context.TODO())
 }

@@ -15,3 +15,8 @@ type PeliculaDto struct {
 	Year        int    `json:"year" binding:"required"`
 	TematicaID  int64  `json:"tematicaID" binding:"required"`
 }
+
+type UsuarioDto struct {
+	Nombre      string `json:"nombre" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
