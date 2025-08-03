@@ -1,8 +1,10 @@
 package routes
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 
@@ -100,5 +102,68 @@ func PeliculaFotoGetByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"datos": fotosPelicula,
 		"msg":   "Fotos encontradas",
+	})
+}
+
+func PeliculaFotoDeleteByID(ctx *gin.Context) {
+	idPelicula, err := strconv.Atoi(ctx.Param("idP"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "ID no válido", "detail": err.Error(),
+		})
+		return
+	}
+	idFoto, err := strconv.Atoi(ctx.Param("idF"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "ID no válido", "detail": err.Error(),
+		})
+		return
+	}
+
+	fotoPeliculaToDelete := models.PeliculaFotoModel{ID: int64(idFoto), PeliculaID: int64(idPelicula)}
+	err = connection.DB.NewSelect().Model(&fotoPeliculaToDelete).WherePK().Where("pelicula_id=?", idPelicula).Limit(1).Scan(ctx.Request.Context())
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"msg":   "No se encontró la foto",
+			"error": err.Error(),
+		})
+		return
+	}
+
+	res, err := connection.DB.NewDelete().Model(&fotoPeliculaToDelete).WherePK().Exec(ctx.Request.Context())
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"msg":   "Error",
+			"error": err.Error(),
+		})
+		return
+	}
+	ra, errRa := res.RowsAffected()
+	if errRa != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"msg":   "Error al verificar filas afectadas",
+			"error": errRa.Error(),
+		})
+		return
+	}
+	if ra == 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"msg": "No se logro eliminar la foto de la pelicula.",
+		})
+		return
+	}
+
+	rutaArchivo := filepath.Join("public", "uploads", "peliculas", fotoPeliculaToDelete.Nombre)
+	if err := os.Remove(rutaArchivo); err != nil && !errors.Is(err, os.ErrNotExist) {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"msg":   "Error al eliminar el archivo del disco",
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "foto de la pelicula eliminada correctamente",
 	})
 }
