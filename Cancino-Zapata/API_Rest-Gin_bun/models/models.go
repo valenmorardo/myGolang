@@ -42,4 +42,5 @@ type UserModel struct {
 	ID       int64  `bun:",pk,autoincrement" json:"id"`
 	Nombre   string `bun:"nombre,notnull" json:"nombre"`
 	Password string `bun:"password,notnull" json:"password"`
+	Email    string `bun:"email,notnull,unique" json:"email"`
 }

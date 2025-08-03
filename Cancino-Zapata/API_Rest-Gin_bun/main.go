@@ -52,6 +52,9 @@ func main() {
 	router.GET(routePrefix+"pelicula/:id/fotos", routes.PeliculaFotoGetByID)
 	router.DELETE(routePrefix+"pelicula/:idP/fotos/:idF", routes.PeliculaFotoDeleteByID)
 
+	// router para usuario
+	router.POST(routePrefix+"usuario/register", routes.UsuarioRegister)
+
 	fmt.Printf("\n\nCorriendo server de GIN en: localhost:%v\n\n", config.CfgEnv.SvPort)
 
 	// le digo al server donde quiero que escuche, el puerto

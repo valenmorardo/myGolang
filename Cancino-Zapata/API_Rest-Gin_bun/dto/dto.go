@@ -19,4 +19,5 @@ type PeliculaDto struct {
 type UsuarioDto struct {
 	Nombre      string `json:"nombre" binding:"required"`
 	Password string `json:"password" binding:"required"`
+	Email string `json:"email" binding:"required"`
 }
